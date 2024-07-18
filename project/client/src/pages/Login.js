@@ -1,29 +1,45 @@
-import React, { useEffect } from 'react'
+import React, { useEffect } from "react";
 import { Button, Form, Input, message } from "antd";
 import { Link, useNavigate } from "react-router-dom";
-import { LoginUser } from '../calls/users';
+import { LoginUser } from "../calls/users";
+import axios from "axios";
 
 function Login() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if(localStorage.getItem('token')){
-        navigate("/");
+    if (localStorage.getItem("token")) {
     }
-  }, [navigate]); 
+  }, [navigate]);
 
   const onFinish = async (values) => {
     try {
       const response = await LoginUser(values);
       if (response.success) {
         message.success(response.message);
-        localStorage.setItem('token', response.token);
-        navigate('/');
+        localStorage.setItem("token", response.token);
+
+        const response2 = await axios.get("/api/users/get-current-user", {
+          headers: {
+            Authorization: `Bearer ${response.token}`,
+          },
+        });
+
+        console.log(
+          "This is me: -  " + JSON.stringify(response2.data.data.role)
+        );
+        if (response2.data.data.role === "admin") {
+          navigate("/admin");
+        } else if (response2.data.data.role === "partner") {
+          navigate("/partner");
+        } else {
+          navigate("/");
+        }
       } else {
         message.error(response.message);
       }
     } catch (error) {
-      message.error(error.message);
+      message.error(error.message + " Please try again");
     }
   };
 
@@ -54,11 +70,20 @@ function Login() {
                 className="d-block"
                 rules={[{ required: true, message: "Password is required" }]}
               >
-                <Input id="password" type="password" placeholder="Enter your Password" />
+                <Input
+                  id="password"
+                  type="password"
+                  placeholder="Enter your Password"
+                />
               </Form.Item>
 
               <Form.Item className="d-block">
-                <Button type="primary" block htmlType="submit" style={{ fontSize: "1rem", fontWeight: "600" }}>
+                <Button
+                  type="primary"
+                  block
+                  htmlType="submit"
+                  style={{ fontSize: "1rem", fontWeight: "600" }}
+                >
                   Login
                 </Button>
               </Form.Item>

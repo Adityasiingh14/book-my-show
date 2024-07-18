@@ -10,8 +10,10 @@ function Register() {
       const response = await RegisterUser(values);
       if (response.success) {
         message.success(response.message);
+        navigate("/login");
       } else {
         message.error(response.message);
+        navigate("/login");
       }
     } catch (error) {
       message.error(error.message);
@@ -92,15 +94,14 @@ function Register() {
                 name="role"
                 className="d-block text-center"
                 initialValue={false}
-                rules={[{ required: true, message: "Please select an option!" }]}
+                rules={[
+                  { required: true, message: "Please select an option!" },
+                ]}
               >
                 <div className="d-flex justify-content-start">
-                  <Radio.Group
-                    name="radiogroup"
-                    className="flex-start"
-                  >
-                    <Radio value={'partner'}>Yes</Radio>
-                    <Radio value={'user'}>No</Radio>
+                  <Radio.Group name="radiogroup" className="flex-start">
+                    <Radio value={"partner"}>Yes</Radio>
+                    <Radio value={"user"}>No</Radio>
                   </Radio.Group>
                 </div>
               </Form.Item>
